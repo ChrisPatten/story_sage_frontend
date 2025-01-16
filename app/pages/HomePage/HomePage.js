@@ -20,6 +20,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@/app/components/Button/Button';
+import SelectorModal from '@/app/containers/SelectorModal/SelectorModal';
 
 // Main component for the HomePage
 export default function HomePage() {
@@ -34,6 +35,8 @@ export default function HomePage() {
   const conversationEndRef = useRef(null); // Reference to the end of the conversation for auto-scrolling
   const [dialogOpen, setDialogOpen] = useState(false); // State to manage the dialog visibility
   const [conversationId, setConversationId] = useState(null); // Conversation ID
+  const [openSeriesModal, setOpenSeriesModal] = useState(false); // State to manage the modal visibility
+  const [selectedSeriesBooks, setSelectedSeriesBooks] = useState(null);
 
   // Handle series change event
   const handleSeriesChange = (event) => {
@@ -114,11 +117,17 @@ export default function HomePage() {
     handleCloseDialog();
   };
 
+  const handleOpenSeriesModal = () => setOpenSeriesModal(true);
+  const handleCloseSeriesModal = () => {
+    setOpenSeriesModal(false);
+    setSelectedSeriesBooks(null);
+  };
   // Fetch series data when the component mounts
   useEffect(() => {
     const fetchSeries = async () => {
       const seriesData = await getSeries();
       setSeries(seriesData);
+      console.log(seriesData);
       const lastSeries = getLastSeries();
       if (lastSeries) {
         setSelectedSeries(lastSeries);
@@ -140,6 +149,7 @@ export default function HomePage() {
     conversationEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [conversation]);
 
+
   // Render the component
   return (
     <>
@@ -149,6 +159,21 @@ export default function HomePage() {
           <Typography>
             Welcome to Story Sage. You can choose a series then ask questions about the books and chapters that you've read so far.
           </Typography>
+          <Button 
+            variant="contained"
+            color="primary"
+            onClick={handleOpenSeriesModal}
+          >
+            Select Series
+          </Button>
+          <SelectorModal 
+            open={openSeriesModal}
+            onClose={handleCloseSeriesModal}
+            seriesData={series}
+            onSeriesSelect={setSelectedSeries}
+            onBookSelect={setSelectedBook}
+            onChapterSelect={setSelectedChapter}
+          />
         </Box>
         <ConversationInterface
           series={series}
