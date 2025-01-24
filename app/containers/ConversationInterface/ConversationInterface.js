@@ -50,31 +50,13 @@ const ConversationInterface = ({
 
 
   const [isExpanded, setIsExpanded] = useState(false);
-  // useEffect(() => {
-  //   console.log('Series Data:', series);
-  //   console.log('Selected Series:', selectedSeries);
-  //   console.log('Selected Book:', selectedBook);
-  //   console.log('Selected Chapter:', selectedChapter);
-  // }, [series, selectedSeries, selectedBook, selectedChapter]);
-
-
-  // Safe access to series data
-  // const selectedSeriesBooks = useMemo(() => {
-  //   if (!series || !selectedSeries) return [];
-  //   const found = series.find(s => s.seriesId === selectedSeries);
-  //   if (!found) {
-  //     console.warn('Selected series not found in series data:', selectedSeries);
-  //     return [];
-  //   }
-  //   return found.books || [];
-  // }, [series, selectedSeries]);
 
   // Expand UI if no series is selected
-  // useEffect(() => {
-  //   if (!selectedSeries) {
-  //     setIsExpanded(true);
-  //   }
-  // }, [selectedSeries]);
+  useEffect(() => {
+    if (!selectedSeries) {
+      setIsExpanded(true);
+    }
+  }, [selectedSeries]);
 
   const questionHistory = useRef(new QuestionHistory());
 
@@ -141,7 +123,7 @@ const ConversationInterface = ({
             )}
             {isExpanded && (
               <>
-                <Typography sx={{fontFamily: theme.typography.introMessage.fontFamily}}>
+                <Typography variant="selectorInstructions">
                   Pick a series, book, and chapter to start a conversation. I'll try to remember your choices for next time.
                 </Typography>
               </>
@@ -214,23 +196,30 @@ const ConversationInterface = ({
                 value={selectedBook || ''}
                 onChange={handleBookChange}
                 disabled={!selectedSeries || conversationLoading}
+                renderValue={(value) => {
+                  const book = selectedSeriesBooks.find(b => b.numberInSeries === value);
+                  return book ? `${book.title} (${book.numberInSeries})` : '';
+                }}
               >
                 {selectedSeriesBooks.map(b => {
                   const img = b.coverImage ? `${imageUrl}/${b.coverImage}` : null;
-                  return (
-                    <ConditionalWrapper
+                  const content = (
+                    <MenuItem 
                       key={b.numberInSeries}
-                      condition={img}
-                      wrapper={(children) => (
-                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: '5px' }}>
-                          <img src={img} alt={b.title} style={{ height: '36px', marginLeft: '6px'}} />
-                          {children}
-                        </div>
-                      )}
+                      value={b.numberInSeries}
                     >
-                      <MenuItem key={b.numberInSeries} value={b.numberInSeries}>{b.title} ({b.numberInSeries})</MenuItem>
-                    </ConditionalWrapper>
-                  )
+                      {img && (
+                        <img 
+                          src={img} 
+                          alt={b.title} 
+                          style={{ height: '36px', marginRight: '6px'}} 
+                        />
+                      )}
+                      {b.title} ({b.numberInSeries})
+                    </MenuItem>
+                  );
+
+                  return content;
                 })}
               </Select>
             </FormControl>
@@ -363,11 +352,6 @@ const ConversationInterface = ({
             sx={{
               marginTop: 1, 
               marginBottom: 1,
-              // backgroundColor: theme.palette.primary.dark,
-              // color: "white",
-              // '&:hover': {
-              //   backgroundColor: theme.palette.primary.highlight,
-              // }
             }}
             onClick={handleQuestionSubmit}
             disabled={
@@ -379,7 +363,9 @@ const ConversationInterface = ({
               conversationLoading
             }
           >
+            <Typography variant="button">
             Ask
+            </Typography>
           </Button>
         </Box>
       </ConditionalWrapper>

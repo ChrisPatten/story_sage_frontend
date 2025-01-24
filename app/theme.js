@@ -12,11 +12,6 @@ const paperWhite = '#F7F7F7';
 const nonPhotoBlue = '#B1E5F2';
 const deepPlum = '#301e2c';
 
-const roboto = Roboto({
-  weight: ['300', '400', '500', '700'],
-  subsets: ['latin'],
-  display: 'swap',
-});
 
 const libreCaslonDisplay = Libre_Caslon_Display({
   weight: ['400'],
@@ -38,26 +33,6 @@ const inLivingColor = localFont({
 const kidTShirt = localFont({
   src: './fonts/kidstshirt-lgzaz-webfont.woff2',
   display: 'swap',
-})
-
-const vestardia = localFont({
-  src: './fonts/vestardiaregular-wobjp-webfont.woff2',
-  display: 'swap',
-})
-
-const lifesavers = localFont({
-  src: [
-    {
-      path: './fonts/lifesavers-regular-webfont.woff2',
-      weight: '400',
-      style: 'normal',
-    },
-    {
-      path: './fonts/lifesavers-bold-webfont.woff2',
-      weight: '700',
-      style: 'normal',
-    }
-  ]
 })
 
 const theme = createTheme({
@@ -86,40 +61,38 @@ const theme = createTheme({
     }
   },
   typography: {
-    fontFamily: roboto.style.fontFamily,
+    fontFamily: libreCaslonDisplay.style.fontFamily,
     letterSpacing: '0.02em',
     pageTitle: {
       fontFamily: inLivingColor.style.fontFamily,
       fontSize: '2rem',
       fontWeight: 500,
-      // Optional additional styling
       lineHeight: 1.2,
       letterSpacing: '0.02em'
     },
     introMessage: {
-      fontFamily: lifesavers.style.fontFamily,
+      fontSize: '1.4rem',
+      lineHeight: 1.2,
+      letterSpacing: '0.02em'
+    },
+    selectorInstructions: {
       fontSize: '1.2rem',
-      fontWeight: 700,
-      // Optional additional styling
       lineHeight: 1.2,
       letterSpacing: '0.02em'
     },
     pageAccent: {
       fontFamily: kidTShirt.style.fontFamily,
-      // Optional additional styling
       lineHeight: 1.2,
       letterSpacing: '0.02em'
     },
     inputLabel: {
       fontFamily: kidTShirt.style.fontFamily,
-      // Optional additional styling
       fontSize: '2rem',
       lineHeight: 1.2,
       letterSpacing: '0.02em'
     },
     currentLabel: {
       fontFamily: kidTShirt.style.fontFamily,
-      // Optional additional styling
       fontSize: '2rem',
       lineHeight: 1.2,
       letterSpacing: '0.02em'
@@ -131,11 +104,15 @@ const theme = createTheme({
       letterSpacing: '0.02em'
     },
     userMessage: {
-      fontFamily: roboto.style.fontFamily,
+      fontFamily: libreCaslonText.style.fontFamily,
       fontSize: '1rem',
       lineHeight: 1.2,
       letterSpacing: '0.0em'
-    }
+    },
+    button: {
+      fontFamily: kidTShirt.style.fontFamily,
+      fontSize: '1.5rem',
+    },
   },
 });
 
