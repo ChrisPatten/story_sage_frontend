@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useMemo } from 'react';
+import React, { useRef, useState, useEffect, forwardRef } from 'react';
 import Box from '@/app/components/Box/Box';
 import Typography from '@/app/components/Typography/Typography';
 import Select from '@/app/components/Select/Select';
@@ -7,8 +7,9 @@ import FormControl from '@/app/components/FormControll/FormControl';
 import InputLabel from '@/app/components/InputLabel/InputLabel';
 import MenuItem from '@/app/components/MenuItem/MenuItem';
 import TextField from '@/app/components/TextField/TextField';
+import getAutocomplete from '@/app/services/getAutocomplete';
+import { MentionsInput, Mention } from 'react-mentions';
 import Button from '@/app/components/Button/Button';
-import SageLoading from '@/app/components/SageLoading/SageLoading';
 import ConditionalWrapper from '@/app/components/ConditionalWrapper/ConditionalWrapper';
 import ConversationBubble from '@/app/containers/ConversationBubble/ConversationBubble';
 import ConversationDivider from '@/app/containers/ConversationDivider/ConversationDivider';
@@ -47,9 +48,20 @@ const ConversationInterface = ({
   const isL = useMediaQuery(theme.breakpoints.up('lg'));
   const isM = useMediaQuery(theme.breakpoints.up('md'));
   const isS = useMediaQuery(theme.breakpoints.up('sm'));
-
-
+  const [autocompleteDictionary, setAutocompleteDictionary] = useState({});
   const [isExpanded, setIsExpanded] = useState(false);
+
+  useEffect(() => {
+    if (selectedChapter) {
+      getChapterAutocomplete();
+    }
+  }, [selectedChapter]);
+
+  useEffect(() => {
+    if (selectedChapter) {
+      getChapterAutocomplete();
+    }
+  }, []);
 
   // Expand UI if no series is selected
   useEffect(() => {
@@ -57,6 +69,14 @@ const ConversationInterface = ({
       setIsExpanded(true);
     }
   }, [selectedSeries]);
+
+  const getChapterAutocomplete = async () => {
+    if (selectedSeries && selectedBook && selectedChapter) {
+      const result = await getAutocomplete(selectedSeries, selectedBook, selectedChapter);
+      console.log(result)
+      setAutocompleteDictionary(result);
+    }
+  };
 
   const questionHistory = useRef(new QuestionHistory());
 
@@ -89,6 +109,30 @@ const ConversationInterface = ({
     },
     top: "-10px"
   };
+
+  const Temp = forwardRef((props, ref) => {
+    const [value, setValue] = useState("");
+    console.log({ props, value });
+  
+    return (
+      <MentionsInput
+        value={props.value}
+        onChange={(e) => setCurrentQuestion(e.target.value)}
+        onKeyPress={(e) => {
+          if (e.key === 'Enter') {
+            handleAskQuestion();
+          }
+        }}
+        singleLine={!props.multiline}
+        inputRef={props?.ref ?? ref}
+      >
+        <Mention
+          trigger="@"
+          data={autocompleteDictionary}
+        />
+      </MentionsInput>
+    );
+  });
 
   return (
     <>
@@ -334,8 +378,6 @@ const ConversationInterface = ({
             fullWidth
             variant="outlined"
             value={currentQuestion || ''}
-            onChange={(e) => setCurrentQuestion(e.target.value)}
-            onKeyDown={handleKeyDown}
             sx = {{marginTop: 1, marginBottom: 1, marginRight: 1}}
             disabled={
               series.length === 0 ||
@@ -344,7 +386,9 @@ const ConversationInterface = ({
               !selectedChapter ||
               conversationLoading
             }
-            inputRef={questionInputRef}
+            InputProps={{
+              components: { Input: Temp }
+            }}
           />
           <Button
             variant="contained"
